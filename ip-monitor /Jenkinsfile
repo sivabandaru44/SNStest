@@ -1,11 +1,56 @@
 pipeline {
     agent any
 
+    environment {
+        TARGET_IP = "35.154.85.149"   // 👉 Replace with your EC2 IP
+        S3_BUCKET = "test-test-pipeline"   // 👉 Replace with your S3 bucket
+    }
+
     stages {
-        stage('Test') {
+
+        stage('Clone Repository') {
             steps {
-                echo 'Jenkins working'
+                git 'https://github.com/sivabandaru44/SNStest.git'
             }
+        }
+
+        stage('Make Script Executable') {
+            steps {
+                sh 'chmod +x ip_monitor.sh'
+            }
+        }
+
+        stage('Run IP Monitoring Script') {
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'AWS_cred'
+                ]]) {
+                    sh './ip_monitor.sh $TARGET_IP'
+                }
+            }
+        }
+
+        stage('Upload Logs to S3') {
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'AWS_cred'
+                ]]) {
+                    sh '''
+                    aws s3 cp ip_monitor.log s3://$S3_BUCKET/ip_monitor.log
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline executed successfully ✅'
+        }
+        failure {
+            echo 'Pipeline failed ❌'
         }
     }
 }
