@@ -16,13 +16,23 @@ IP=$1
 echo "Checking IP: $IP"
 ping -c 3 $IP
 '''
+                echo 'Script created'
             }
         }
 
-        stage('Run Monitoring') {
+        stage('Run Script using Git Bash') {
             steps {
                 bat '"C:\\Program Files\\Git\\bin\\bash.exe" ip_monitor.sh %TARGET_IP%'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'SUCCESS ✅'
+        }
+        failure {
+            echo 'FAILED ❌'
         }
     }
 }
