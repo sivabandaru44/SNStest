@@ -13,17 +13,15 @@ pipeline {
 #!/bin/bash
 
 IP=$1
-echo IP is $IP
+echo "Checking IP: $IP"
+ping -c 3 $IP
 '''
-
-                // Windows command
-                bat 'echo Script created'
             }
         }
 
-        stage('Run Script') {
+        stage('Run Monitoring') {
             steps {
-                bat 'echo Running on Windows'
+                bat '"C:\\Program Files\\Git\\bin\\bash.exe" ip_monitor.sh %TARGET_IP%'
             }
         }
     }
