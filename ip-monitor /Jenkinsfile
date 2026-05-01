@@ -24,7 +24,7 @@ pipeline {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-creds'
+                    credentialsId: 'AWS_cred'
                 ]]) {
                     sh './ip_monitor.sh $TARGET_IP'
                 }
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-creds'
+                    credentialsId: 'AWS_cred'
                 ]]) {
                     sh '''
                     aws s3 cp ip_monitor.log s3://$S3_BUCKET/ip_monitor.log
