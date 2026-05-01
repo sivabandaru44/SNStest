@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+
+    environment {
+        TARGET_IP = "35.154.85.149"
+    }
+
+    stages {
+
+        stage('Clone Repo') {
+            steps {
+                git 'https://github.com/sivabandaru44/SNStest/new/main/ip-monitor.git'
+            }
+        }
+
+        stage('Run IP Monitoring') {
+            steps {
+                sh 'chmod +x ip_monitor.sh'
+                sh './ip_monitor.sh $TARGET_IP'
+            }
+        }
+
+        stage('Upload Logs to S3') {
+            steps {
+                sh '''
+                aws s3 cp ip_monitor.log s3://test-test-pipeline/
+                '''
+            }
+        }
+    }
+}
